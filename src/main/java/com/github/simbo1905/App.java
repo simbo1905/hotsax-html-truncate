@@ -19,31 +19,39 @@ public class App
     	
     	ContentHandler handler = new DoNothingContentHandler(){
 
+    		StringBuilder wholeTag = new StringBuilder();
+    		
+			@Override
+			public void characters(char[] ch, int start, int length)
+					throws SAXException {
+				wholeTag.append(new String(ch, start, length));
+			}
+
 			@Override
 			public void endElement(String namespaceURI, String localName,
 					String qName) throws SAXException {
-				builder.append("</"+ localName +">");
+				wholeTag.append("</"+ localName +">");
 			}
 
 			@Override
 			public void startElement(String namespaceURI, String localName,
 					String qName, Attributes atts) throws SAXException {
-				builder.append("<"+ localName + " ");
+				wholeTag.append("<"+ localName);
 				for( int i = 0; i < atts.getLength(); i++) {
-					builder.append(atts.getLocalName(i)+"='"+atts.getValue(i)+"'");
+					wholeTag.append(" "+atts.getLocalName(i)+"='"+atts.getValue(i)+"'");
 				}
-				builder.append(">");
+				wholeTag.append(">");
+				builder.append(wholeTag.toString());
+				wholeTag = new StringBuilder();
 			}
     		
     	};
 		parser.setContentHandler(handler);
 		
-		String myString = "<img src=\"http://d2qxdzx5iw7vis.cloudfront.net/34775606.jpg\" />\n<br/><a href=\"htt";
+		//parser.parse(new InputSource( new StringReader( "<div>this is the <em>end</em> my <br> friend <a href=\"whatever\">some link</a>" ) ));
+		parser.parse(new InputSource( new StringReader( "<img src=\"http://d2qxdzx5iw7vis.cloudfront.net/34775606.jpg\" />\n<br/><a href=\"htt" ) ));
 		
-		InputSource inputSource = new InputSource( new StringReader( myString ) );
-		
-		parser.parse(inputSource);
-    	
         System.out.println( builder.toString() );
+
     }
 }
